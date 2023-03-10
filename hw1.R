@@ -14,6 +14,31 @@ sum(is.na(twitter_clean$airline_sentiment_confidence))
 head(twitter_clean)
 
 
+tweets_df <- Tweets
+# Question 3: What is the sentiment distribution of tweets from different airlines on each day of the week?
+tweets_df %>%
+  mutate(weekday = weekdays(as.Date(tweet_created))) %>%
+  group_by(weekday, airline, airline_sentiment) %>%
+  summarise(count=n()) %>%
+  ggplot(aes(x=weekday, y=count, fill=airline_sentiment)) +
+  geom_bar(stat="identity", position = "stack") +
+  ggtitle("Sentiment Distribution of Tweets from Different Airlines on Each Day of the Week") +
+  xlab("Weekday") +
+  ylab("Count") +
+  facet_grid(~ airline) +
+  theme_minimal()
+
+# Question 4: What is the distribution of tweet sentiment by sentiment confidence level for each airline?
+tweets_df %>%
+  group_by(airline, airline_sentiment, negativereason_confidence) %>%
+  summarise(count=n()) %>%
+  ggplot(aes(x=negativereason_confidence, y=count, fill=airline_sentiment)) +
+  geom_bar(stat="identity", position = "stack") +
+  ggtitle("Distribution of Tweet Sentiment by Sentiment Confidence Level for Each Airline") +
+  xlab("Sentiment Confidence Level") +
+  ylab("Count") +
+  facet_grid(~ airline) +
+  theme_minimal()
 
 summary(twitter_clean)
 
