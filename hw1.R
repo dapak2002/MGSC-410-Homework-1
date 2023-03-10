@@ -1,6 +1,7 @@
 library(dplyr)
 library(ggplot2)
 library(caret)
+library(tidyverse)
 
 duplicated_rows <- duplicated(Tweets)
 
@@ -15,7 +16,6 @@ head(twitter_clean)
 
 
 tweets_df <- Tweets
-# Question 3: What is the sentiment distribution of tweets from different airlines on each day of the week?
 tweets_df %>%
   mutate(weekday = weekdays(as.Date(tweet_created))) %>%
   group_by(weekday, airline, airline_sentiment) %>%
@@ -26,18 +26,28 @@ tweets_df %>%
   xlab("Weekday") +
   ylab("Count") +
   facet_grid(~ airline) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
+
+tweets_df %>%
+  mutate(tweet_length = nchar(text)) %>%
+  group_by(airline, airline_sentiment) %>%
+  ggplot(aes(x=airline_sentiment, y=tweet_length, fill=airline_sentiment)) +
+  geom_boxplot() +
+  ggtitle("Distribution of Tweet Sentiment by the Length of the Tweet for Each Airline") +
+  xlab("Sentiment") +
+  ylab("Tweet Length") +
+  scale_fill_brewer(palette = "Set1") +
   theme_minimal()
 
-# Question 4: What is the distribution of tweet sentiment by sentiment confidence level for each airline?
 tweets_df %>%
-  group_by(airline, airline_sentiment, negativereason_confidence) %>%
-  summarise(count=n()) %>%
-  ggplot(aes(x=negativereason_confidence, y=count, fill=airline_sentiment)) +
-  geom_bar(stat="identity", position = "stack") +
-  ggtitle("Distribution of Tweet Sentiment by Sentiment Confidence Level for Each Airline") +
-  xlab("Sentiment Confidence Level") +
-  ylab("Count") +
-  facet_grid(~ airline) +
+  group_by(airline_sentiment) %>%
+  ggplot(aes(x=airline_sentiment, y=airline_sentiment_confidence, fill=airline_sentiment)) +
+  geom_boxplot() +
+  ggtitle("Distribution of Confidence Scores for Each Tweet Sentiment Category") +
+  xlab("Sentiment") +
+  ylab("Confidence Score") +
+  scale_fill_brewer(palette = "Set1") +
   theme_minimal()
 
 summary(twitter_clean)
